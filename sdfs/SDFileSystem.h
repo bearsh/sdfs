@@ -17,8 +17,8 @@
 #ifndef SD_FILE_SYSTEM_H
 #define SD_FILE_SYSTEM_H
 
-#include "mbed.h"
-#include "FATFileSystem.h"
+#include "mbed-drivers/mbed.h"
+#include "fatfs/FATFileSystem.h"
 
 /** SDFileSystem class.
  *  Used for creating a virtual file system for accessing SD/MMC cards via SPI.

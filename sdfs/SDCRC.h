@@ -17,7 +17,7 @@
 #ifndef SD_CRC_H
 #define SD_CRC_H
 
-#include "mbed.h"
+#include "mbed-drivers/mbed.h"
 
 namespace SDCRC
 {

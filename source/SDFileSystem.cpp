@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-#include "SDFileSystem.h"
-#include "diskio.h"
+#include "sdfs/SDFileSystem.h"
+#include "fatfs/diskio.h"
 #include "pinmap.h"
-#include "SDCRC.h"
+#include "sdfs/SDCRC.h"
 
 SDFileSystem::SDFileSystem(PinName mosi, PinName miso, PinName sclk, PinName cs, const char* name, PinName cd, SwitchType cdtype, int hz)
     : FATFileSystem(name),
