@@ -1,0 +1,16 @@
+{
+  "name": "sdfs",
+  "version": "0.0.0",
+  "description": "SD File System with CRC and card removal/replacement support",
+  "keywords": [
+    "fs",
+    "sd",
+    "sdfs"
+  ],
+  "author": "Neil Thiessen",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "mbed-drivers": "~1.0.0",
+    "fatfs": "*"
+  }
+}
