@@ -1,6 +1,6 @@
 {
   "name": "sdfs",
-  "version": "0.0.0",
+  "version": "0.22.0",
   "description": "SD File System with CRC and card removal/replacement support",
   "keywords": [
     "fs",
