@@ -16,6 +16,6 @@
   "license": "Apache-2.0",
   "dependencies": {
     "mbed-drivers": "^1.0.0",
-    "fatfs": "git@github.com:bearsh/fatfs.git#>=0.7.0"
+    "fatfs": "git@github.com:bearsh/fatfs.git#>=0.7.1"
   }
 }
