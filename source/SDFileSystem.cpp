@@ -19,12 +19,16 @@
 #include "pinmap.h"
 #include "sdfs/SDCRC.h"
 
+#define CD_DEB_DELAY_MS     200
+
 SDFileSystem::SDFileSystem(PinName mosi, PinName miso, PinName sclk, PinName cs, const char* name, PinName cd, SwitchType cdtype, int hz)
     : FATFileSystem(name),
       m_Spi(mosi, miso, sclk),
       m_Cs(cs, 1),
       m_Cd(cd),
-      m_FREQ(hz)
+      m_FREQ(hz),
+      m_CardDetectionEvtHandle(0),
+      m_CardPresenceChangeCb(0)
 {
     //Initialize the member variables
     m_CardType = CARD_NONE;
@@ -43,21 +47,21 @@ SDFileSystem::SDFileSystem(PinName mosi, PinName miso, PinName sclk, PinName cs,
     if (cdtype == SWITCH_POS_NO) {
         m_Cd.mode(PullDown);
         m_CdAssert = 1;
-        m_Cd.fall(this, &SDFileSystem::onCardRemoval);
     } else if (cdtype == SWITCH_POS_NC) {
         m_Cd.mode(PullDown);
         m_CdAssert = 0;
-        m_Cd.rise(this, &SDFileSystem::onCardRemoval);
     } else if (cdtype == SWITCH_NEG_NO) {
         m_Cd.mode(PullUp);
         m_CdAssert = 0;
-        m_Cd.rise(this, &SDFileSystem::onCardRemoval);
     } else if (cdtype == SWITCH_NEG_NC) {
         m_Cd.mode(PullUp);
         m_CdAssert = 1;
-        m_Cd.fall(this, &SDFileSystem::onCardRemoval);
     } else {
         m_CdAssert = -1;
+    }
+    if (cdtype != SWITCH_NONE) {
+        m_Cd.fall(this, &SDFileSystem::onCardDetection);
+        m_Cd.rise(this, &SDFileSystem::onCardDetection);
     }
 }
 
@@ -406,10 +410,26 @@ uint32_t SDFileSystem::disk_sectors()
     return 0;
 }
 
-void SDFileSystem::onCardRemoval()
+void SDFileSystem::onCardDetection()
 {
     //Check the card socket
     checkSocket();
+
+    if (m_CardPresenceChangeCb) {
+        if (m_CardDetectionEvtHandle) {
+            minar::Scheduler::cancelCallback(m_CardDetectionEvtHandle);
+        }
+        m_CardDetectionEvtHandle = minar::Scheduler::postCallback(this, &SDFileSystem::onCardDetectionCb) \
+                .delay(minar::milliseconds(CD_DEB_DELAY_MS)).getHandle();
+    }
+}
+
+void SDFileSystem::onCardDetectionCb()
+{
+    m_CardDetectionEvtHandle = 0;
+    if (m_CardPresenceChangeCb) {
+        m_CardPresenceChangeCb.call(card_present());
+    }
 }
 
 inline void SDFileSystem::checkSocket()

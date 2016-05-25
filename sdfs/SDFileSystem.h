@@ -110,6 +110,23 @@ public:
      */
     bool card_present();
 
+    /** Callback to call on change in card presence
+     *
+     * @param cb Functionpointer
+     */
+    void set_card_present_callback(void (*cb)(bool)) {
+        m_CardPresenceChangeCb.attach(cb);
+    }
+    /** Callback to call on change in card presence
+     *
+     * @param object Pointer to object instance
+     * @param member Memberfunction
+     */
+    template<typename T>
+    void set_card_present_callback(T *object, void (T::*member)(bool)) {
+        m_CardPresenceChangeCb.attach(object, member);
+    }
+
     /** Get the detected SD/MMC card type
      *
      * @returns The detected card type as a CardType enum.
@@ -203,9 +220,12 @@ private:
     bool m_LargeFrames;
     bool m_WriteValidation;
     int m_Status;
+    minar::callback_handle_t m_CardDetectionEvtHandle;
+    util::FunctionPointer1<void, bool> m_CardPresenceChangeCb;
 
     //Internal methods
-    void onCardRemoval();
+    void onCardDetection();
+    void onCardDetectionCb();
     void checkSocket();
     bool waitReady(int timeout);
     bool select();
