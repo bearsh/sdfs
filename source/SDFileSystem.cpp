@@ -153,6 +153,7 @@ int SDFileSystem::disk_initialize()
 {
     char token;
     unsigned int resp;
+    Timer timer;
 
     //Make sure there's a card in the socket before proceeding
     checkSocket();
@@ -203,13 +204,13 @@ int SDFileSystem::disk_initialize()
             return m_Status;
         }
 
-        //Try to initialize the card using ACMD41(0x00100000)
-        for (int i = 0; i < 1000; i++) {
+        //Try to initialize the card using ACMD41(0x40100000) for up to 2 seconds
+        timer.start();
+        do {
             token = commandTransaction(ACMD41, 0x40100000);
-            if (token != 0x01) {
-                break;
-            }
-        }
+        } while (token == 0x01 && timer.read_ms() < 2000);
+        timer.stop();
+        timer.reset();
 
         //Check if the card initialized
         if (token != 0x00) {
@@ -254,13 +255,13 @@ int SDFileSystem::disk_initialize()
             return m_Status;
         }
 
-        //Try to initialize the card using ACMD41(0x00100000)
-        for (int i = 0; i < 1000; i++) {
+        //Try to initialize the card using ACMD41(0x40100000) for up to 2 seconds
+        timer.start();
+        do {
             token = commandTransaction(ACMD41, 0x40100000);
-            if (token != 0x01) {
-                break;
-            }
-        }
+        } while (token == 0x01 && timer.read_ms() < 2000);
+        timer.stop();
+        timer.reset();
 
         //Check if the card initialized
         if (token == 0x00) {
@@ -273,13 +274,13 @@ int SDFileSystem::disk_initialize()
             else
                 m_Spi.frequency(m_FREQ);
         } else {
-            //Try to initialize the card using CMD1(0x00100000)
-            for (int i = 0; i < 1000; i++) {
+            //Try to initialize the card using CMD1(0x00100000) for up to 2 seconds
+            timer.start();
+            do {
                 token = commandTransaction(CMD1, 0x00100000);
-                if (token != 0x01) {
-                    break;
-                }
-            }
+            } while (token == 0x01 && timer.read_ms() < 2000);
+            timer.stop();
+            timer.reset();
 
             //Check if the card initialized
             if (token == 0x00) {
